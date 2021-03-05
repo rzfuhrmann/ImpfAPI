@@ -177,4 +177,7 @@
 
     // upload
     $ul = `scp data/all*.json impfapi.rz-fuhrmann.de:/var/www/impfapi.rz-fuhrmann.de/v0/`;
+
+    // influxDB export
+    $ul2 = `influxd backup -portable -retention autogen -database covid_impfungen all_influx.db && 7z a all_influx.7z all_influx.db && scp all_influx.7z impfapi.rz-fuhrmann.de:/var/www/impfapi.rz-fuhrmann.de/v0/ && rm -r all_influx.db && rm all_influx.7z`;
 ?>
