@@ -20,8 +20,6 @@
      * - different format: _object + list!
      */    
 
-    require_once __DIR__ . '/vendor/autoload.php';
-
     $data = array();
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -142,8 +140,13 @@
     $data = array(
         "meta" => array(
             "name" => "Dataset: Impffortschritt Deutschland",
-            "description" => "Please share your feedback and inconsistencies with us so that we can improve this dataset - thank you!\n\nWe try our best, but we provide this data \"proxy\" without any warranty in any kind.",
+            "description" => "Please share your feedback and inconsistencies with us so that we can improve this dataset. No one is perfect, also not this dataset. So let us know anything we can improve / what doesn't make sense. We'll try to consider that feedback for v1. Thank you!\n\nWe try our best, but we provide this data \"proxy\" without any warranty of any kind.",
             "version" => "2021-03-05-".str_replace("\n", "", `git rev-parse --short HEAD`),
+            "ts" => date("Y-m-d H:i:s"),
+            "contact" => array(
+                "email" => "impfapi@rz-fuhrmann.de",
+                "github" => "https://github.com/rzfuhrmann/ImpfAPI"
+            ),
             "datasources" => array(
                 array(
                     "name" => "Impfquotenmonitoring",
@@ -167,11 +170,6 @@
                     "lastpull" => date("Y-m-d H:i:s")
                 )
             ),
-            "ts" => date("Y-m-d H:i:s"),
-            "contact" => array(
-                "email" => "impfapi@rz-fuhrmann.de",
-                "github" => "https://github.com/rzfuhrmann/ImpfAPI"
-            )
         ),
         "data" => $data
     );
