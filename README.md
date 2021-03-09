@@ -1,5 +1,5 @@
 # ImpfAPI
-Script to provide vaccine data and everything around it in one single dataset on a daily basis (or even faster if data sources supports that ;)). 
+Script to provide vaccine data and everything around it in one single dataset on a daily basis (or even faster if data sources supports that ;) ). 
 
 ## Access latest data
 
@@ -12,3 +12,12 @@ Data is automatically refreshed at least once per day, typically each 1-2 hours.
 | v0      | TSV Export | All data as a combined TSV list to be used in Excel etc. | https://impfapi.rz-fuhrmann.de/v0/all_list.tsv |
 
 We'll add live data refresh and more parameters soon in v1. Please let us know your feedback and wishes that should be added to the datasets at [impfapi@rz-fuhrmann.de](mailto:impfapi@rz-fuhrmann.de).
+
+## Datasources
+We're using various data sources to generate that combined dataset. Some values are extrapolated, others are aligned with the rest (e.g. have a cumulative field for each normal value and vice-versa) to have a consistent set of values that are comparable. 
+
+| Datasource | Description | Provider | Earliest available data | URL |
+| --- | --- | --- | --- | --- |
+| Impfquotenmonitoring (XLSX) | Daily report provided by the RKI, unfortunately without historic data. | Robert-Koch-Institut, rki.de | 2020-01-23 | https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Impfquotenmonitoring.xlsx |
+| Vaccine deliveries (TSV) | | Bundesministerium für Gesundheit (BMG), impfdashboard.de | 2020-12-27 | https://impfdashboard.de/static/data/germany_deliveries_timeseries_v2.tsv |
+| Vaccinations (TSV) | | Bundesministerium für Gesundheit (BMG), impfdashboard.de | 2020-12-27 | https://impfdashboard.de/static/data/germany_vaccinations_timeseries_v2.tsv |
