@@ -1,4 +1,5 @@
 data/*.json
+data/*.tsv
 *.log
 vendor/
 cleaneddata.json

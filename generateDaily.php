@@ -51,7 +51,7 @@
         $date = date("Y-m-d", floor($row["time"]/1000000000));
 
         $bundesland = $row["bundesland"];
-        
+
         // They had things like "*" in the data.. 
         if (preg_match("~\*~", $bundesland)) continue; 
         
@@ -304,9 +304,13 @@
     $listoutput["data"] = $listdata;
     file_put_contents(__DIR__.'/data/all_list.json', json_encode($listoutput, JSON_PRETTY_PRINT));
 
+    $tsv = implode("\n", array_map(function ($entry) {
+        return implode("\t", $entry);
+    }, $listdata));
+    file_put_contents(__DIR__.'/data/all_list.tsv', $tsv);
 
     // upload
-    $ul = `scp data/all*.json impfapi.rz-fuhrmann.de:/var/www/impfapi.rz-fuhrmann.de/v0/`;
+    $ul = `scp data/all* impfapi.rz-fuhrmann.de:/var/www/impfapi.rz-fuhrmann.de/v0/`;
 
     // influxDB export
     $ul2 = `influxd backup -portable -retention autogen -database covid_impfungen all_influx.db && 7z a all_influx.7z all_influx.db && scp all_influx.7z impfapi.rz-fuhrmann.de:/var/www/impfapi.rz-fuhrmann.de/v0/ && rm -r all_influx.db && rm all_influx.7z`;
