@@ -13,6 +13,18 @@ Data is automatically refreshed at least once per day, typically each 1-2 hours.
 
 We'll add live data refresh and more parameters soon in v1. Please let us know your feedback and wishes that should be added to the datasets at [impfapi@rz-fuhrmann.de](mailto:impfapi@rz-fuhrmann.de).
 
+## Roadmap
+* [x] cleanup namings (e.g. "Schleswig-Holtstein"/"Schleswig-Holstein", "astra"/"astrazeneca", "Bayern*")
+* [ ] cleanup value names
+* [ ] align cumulative/non-cumulative values
+* [ ] add live requests / "real" API, not just static files, to request specific data
+* [ ] add caching
+* [ ] align different data sources to have similar naming on different breakdowns...
+* [ ] add time ranges to data source definition (not each data source covers the same data)
+* [X] different format: _object + list!
+
+... more Ideas? Let me know: [impfapi@rz-fuhrmann.de](mailto:impfapi@rz-fuhrmann.de)
+
 ## Datasources
 We're using various data sources to generate that combined dataset. Some values are extrapolated, others are aligned with the rest (e.g. have a cumulative field for each normal value and vice-versa) to have a consistent set of values that are comparable. 
 
