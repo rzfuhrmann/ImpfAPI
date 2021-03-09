@@ -52,6 +52,9 @@
 
         $bundesland = $row["bundesland"];
         
+        // They had things like "*" in the data.. 
+        if (preg_match("~\*~", $bundesland)) continue; 
+        
         if (!isset($data[$date])) $data[$date] = array(); 
         if (!isset($data[$date][$bundesland])) $data[$date][$bundesland] = array(); 
 
@@ -195,13 +198,15 @@
         }
         return false; 
     }
+    $listdata = array(); 
     function addNeededValues (&$newdata, $path = []){
-        global $propertynamesByDepth, $data;
+        global $propertynamesByDepth, $data, $listdata;
 
         $depth = sizeof($path); 
         $values = $propertynamesByDepth[$depth]; 
         sort($values);
         
+        $newLine = []; 
         foreach ($values as $value){
             $newpath = $path; 
             $newpath[] = $value; 
@@ -212,16 +217,31 @@
                 if ($val){
                     $newdata[$value] = $val; 
                 }
-                
+                $newLine[] = $newdata[$value]; 
             } else {
                 $newdata[$value] = array(); 
                 addNeededValues($newdata[$value], $newpath);
             }
         }
+        if ($newLine){
+            $listdata[] = array_merge($path, $newLine);
+        }
     }
 
     addNeededValues($newdata);
-    
+
+
+    /*$listdata = array(); 
+    function fillListRow(&$listdata, $path = []){
+        global $propertynamesByDepth;
+
+        if (sizeof($path) == sizeof($path)){
+            // values
+        } else {
+            fillListRow($listdata, )
+        }
+    }
+    fillListRow($listdata);*/
 
     file_put_contents(__DIR__.'/cleaneddata.json', json_encode($newdata, JSON_PRETTY_PRINT));
 
@@ -230,11 +250,11 @@
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // OUTPUT ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    $data = array(
+    $objectdata = array(
         "meta" => array(
             "name" => "Dataset: Impffortschritt Deutschland",
             "description" => "Please share your feedback and inconsistencies with us so that we can improve this dataset. No one is perfect, also not this dataset. So let us know anything we can improve / what doesn't make sense. We'll try to consider that feedback for v1. Thank you!\n\nWe try our best, but we provide this data \"proxy\" without any warranty of any kind.",
-            "version" => "2021-03-05-".str_replace("\n", "", `git rev-parse --short HEAD`),
+            "version" => "2021-03-09-".str_replace("\n", "", `git rev-parse --short HEAD`),
             "ts" => date("Y-m-d H:i:s"),
             "contact" => array(
                 "email" => "impfapi@rz-fuhrmann.de",
@@ -278,7 +298,12 @@
         ),
         "data" => $data
     );
-    file_put_contents(__DIR__.'/data/all_object.json', json_encode($data, JSON_PRETTY_PRINT));
+    file_put_contents(__DIR__.'/data/all_object.json', json_encode($objectdata, JSON_PRETTY_PRINT));
+
+    $listoutput = $objectdata; 
+    $listoutput["data"] = $listdata;
+    file_put_contents(__DIR__.'/data/all_list.json', json_encode($listoutput, JSON_PRETTY_PRINT));
+
 
     // upload
     $ul = `scp data/all*.json impfapi.rz-fuhrmann.de:/var/www/impfapi.rz-fuhrmann.de/v0/`;
