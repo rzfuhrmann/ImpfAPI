@@ -23,6 +23,15 @@
     $data = array();
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // MAPPINGS /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    $vaccineMappings = array(
+        "astra" => "astrazeneca",   // use long name everywhere
+        "comirnaty" => "biontech"   // they use company name for all other vacciones, why not for Biontech?
+    ); 
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // IMPFQUOTENMONITORING XLSX ////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -53,6 +62,9 @@
             $metric = preg_replace("~_".$impfstoff."$~", "", $metric);
 
         }
+
+        // clean up naming
+        if (isset($vaccineMappings[strtolower($impfstoff)])) $impfstoff = $vaccineMappings[strtolower($impfstoff)];
         
         if (!isset($data[$date][$bundesland][$impfstoff])) $data[$date][$bundesland][$impfstoff] = array(); 
 
@@ -81,6 +93,9 @@
                     if (preg_match("~_(biontech|moderna|astrazeneca)_~", $headers[$c], $matches)){
                         $impfstoff = $matches[1];
                     }
+                    // clean up naming
+                    if (isset($vaccineMappings[strtolower($impfstoff)])) $impfstoff = $vaccineMappings[strtolower($impfstoff)];
+
                     if (!isset($data[$date])) $data[$date] = array(); 
                     if (!isset($data[$date][$bundesland])) $data[$date][$bundesland] = array(); 
                     if (!isset($data[$date][$bundesland][$impfstoff])) $data[$date][$bundesland][$impfstoff] = array(); 
@@ -122,7 +137,7 @@
                     "NW" => "Nordrhein-Westfalen",
                     "RP" => "Rheinland-Pfalz",
                     "SL" => "Saarland",
-                    "SH" => "Schleswig-Holtstein",
+                    "SH" => "Schleswig-Holstein",
                     "SN" => "Sachsen",
                     "ST" => "Sachsen-Anhalt",
                     "TH" => "Thüringen",
@@ -130,13 +145,91 @@
                 $bundesland = $bl_short_to_long[$bl_short]; 
                 if (!isset($data[$date])) $data[$date] = array(); 
                 if (!isset($data[$date][$bundesland])) $data[$date][$bundesland] = array(); 
-                if (!isset($data[$date][$bundesland][$cols[1]])) $data[$date][$bundesland][$cols[1]] = array(); 
-                $data[$date][$bundesland][$cols[1]]["dosen_geliefert"] = (int)$cols[3];
+
+                $impfstoff = $cols[1];
+                // clean up naming
+                if (isset($vaccineMappings[strtolower($impfstoff)])) $impfstoff = $vaccineMappings[strtolower($impfstoff)];
+
+                if (!isset($data[$date][$bundesland][$impfstoff])) $data[$date][$bundesland][$impfstoff] = array(); 
+                $data[$date][$bundesland][$impfstoff]["dosen_geliefert"] = (int)$cols[3];
             }
-            
         }
     }
-    // echo json_encode($data, JSON_PRETTY_PRINT);
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // CLEANUP //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // sort by date, just in case the data is mixed-up
+    ksort($data);
+
+    $propertynamesByDepth = array(); 
+    function getPossibleValues($arr, $depth = 0){
+        global $propertynamesByDepth; 
+        if (!isset($propertynamesByDepth[$depth])) $propertynamesByDepth[$depth] = []; 
+
+        foreach ($arr as $index => $value){
+            if (!in_array($index, $propertynamesByDepth[$depth])){
+                $propertynamesByDepth[$depth][] = $index; 
+            }
+            if (is_array($value)){
+                getPossibleValues($value, $depth+1);
+            }
+        }
+    }
+
+    getPossibleValues($data); 
+
+    $newdata = array();
+    $depth_with_data = sizeof($propertynamesByDepth)-1; 
+
+    function getValueByPath($data, $path){
+        $value = array_shift($path); 
+
+        if (isset($data[$value])){
+            if (sizeof($path)){
+                return getValueByPath($data[$value], $path);
+            } else {
+                return $data[$value];
+            }
+        }
+        return false; 
+    }
+    function addNeededValues (&$newdata, $path = []){
+        global $propertynamesByDepth, $data;
+
+        $depth = sizeof($path); 
+        $values = $propertynamesByDepth[$depth]; 
+        sort($values);
+        
+        foreach ($values as $value){
+            $newpath = $path; 
+            $newpath[] = $value; 
+            if ($depth == sizeof($propertynamesByDepth)-1){
+                $newdata[$value] = null; 
+
+                $val = getValueByPath($data, $newpath); 
+                if ($val){
+                    $newdata[$value] = $val; 
+                }
+                
+            } else {
+                $newdata[$value] = array(); 
+                addNeededValues($newdata[$value], $newpath);
+            }
+        }
+    }
+
+    addNeededValues($newdata);
+    
+
+    file_put_contents(__DIR__.'/cleaneddata.json', json_encode($newdata, JSON_PRETTY_PRINT));
+
+    var_dump($propertynamesByDepth); 
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // OUTPUT ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     $data = array(
         "meta" => array(
             "name" => "Dataset: Impffortschritt Deutschland",
@@ -146,6 +239,18 @@
             "contact" => array(
                 "email" => "impfapi@rz-fuhrmann.de",
                 "github" => "https://github.com/rzfuhrmann/ImpfAPI"
+            ),
+            "changelog" => array(
+                array(
+                    "date" => "2021-03-05",
+                    "description" => "Initial version."
+                ),
+                array(
+                    "date" => "2021-03-09",
+                    "description" => 
+                        '- Cleanup: Fixed typos, therefore summarized a few values (e.g. "Schleswig-Holtstein"/"Schleswig-Holstein", "astra"/"astrazeneca")'."\n".
+                        '- Cleanup: Aligned vaccine names, cleaned-up the mix of company names and vaccine names'
+                ),
             ),
             "datasources" => array(
                 array(

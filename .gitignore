@@ -1,3 +1,4 @@
 data/*.json
 *.log
 vendor/
+cleaneddata.json
