@@ -1,5 +1,5 @@
 # ImpfAPI
-Script to provide COVID-19 vaccination data and everything around it in one single big dataset for Germany on a daily basis (or even faster if data sources supports that ;-) ). 
+Script to provide COVID-19 vaccination data and everything around it in one single big dataset for Germany on a daily basis (or even faster if data sources supports that). 
 
 ## Access latest data
 
@@ -31,6 +31,6 @@ We're using various data sources to generate that combined dataset. Some values 
 | Datasource | Description | Provider | Earliest available data | URL |
 | --- | --- | --- | --- | --- |
 | Impfquotenmonitoring (XLSX) | Daily report provided by the RKI, unfortunately without historic data. | Robert-Koch-Institut, rki.de | 2020-01-23 | https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Impfquotenmonitoring.xlsx |
-| Vaccine deliveries (TSV) | | Bundesministerium für Gesundheit (BMG), impfdashboard.de | 2020-12-27 | https://impfdashboard.de/static/data/germany_deliveries_timeseries_v2.tsv |
-| Vaccinations (TSV) | | Bundesministerium für Gesundheit (BMG), impfdashboard.de | 2020-12-27 | https://impfdashboard.de/static/data/germany_vaccinations_timeseries_v2.tsv |
+| Vaccine deliveries (TSV) | time series of vaccine deliveries by BMG | Bundesministerium für Gesundheit (BMG), impfdashboard.de | 2020-12-27 | https://impfdashboard.de/static/data/germany_deliveries_timeseries_v2.tsv |
+| Vaccinations (TSV) | time series of vaccinations by BMG | Bundesministerium für Gesundheit (BMG), impfdashboard.de | 2020-12-27 | https://impfdashboard.de/static/data/germany_vaccinations_timeseries_v2.tsv |
 | Appointment Availability | :warning: Only includes appointment data for _some_ vaccination centers, therefore not included in the JSONs, but in InfluxDB export. | impfterminservice.de / [monitoring script](https://github.com/rzfuhrmann/PHPImpftermine) | 2020-02-01 | https://github.com/rzfuhrmann/PHPImpftermine |
