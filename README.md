@@ -1,5 +1,5 @@
 # ImpfAPI
-Script to provide vaccine data and everything around it in one single dataset on a daily basis (or even faster if data sources supports that ;) ). 
+Script to provide COVID-19 vaccination data and everything around it in one single big dataset for Germany on a daily basis (or even faster if data sources supports that ;-) ). 
 
 ## Access latest data
 
