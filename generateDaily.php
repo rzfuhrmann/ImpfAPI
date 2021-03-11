@@ -38,7 +38,6 @@
     $offset = 0; 
     $recordsPerQuery = 5000; 
     do {
-        echo $offset."\n";
         $json = json_decode(file_get_contents("https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query?where=1%3D1&outFields=*&returnDistinctValues=true&outSR=4326&f=json&resultRecordCount=".$recordsPerQuery."&resultOffset=".$offset), true);
         foreach ($json["features"] as $feature){
             $counts = $feature["attributes"]; 
@@ -68,7 +67,6 @@
             }
         }
         $offset += $recordsPerQuery;
-        file_put_contents(__DIR__.'/test.json', json_encode($json, JSON_PRETTY_PRINT)); 
     } while (isset($json["exceededTransferLimit"]) && $json["exceededTransferLimit"]); 
 
 
