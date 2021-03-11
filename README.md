@@ -34,3 +34,4 @@ We're using various data sources to generate that combined dataset. Some values 
 | Vaccine deliveries (TSV) | time series of vaccine deliveries by BMG | Bundesministerium für Gesundheit (BMG), impfdashboard.de | 2020-12-27 | https://impfdashboard.de/static/data/germany_deliveries_timeseries_v2.tsv |
 | Vaccinations (TSV) | time series of vaccinations by BMG | Bundesministerium für Gesundheit (BMG), impfdashboard.de | 2020-12-27 | https://impfdashboard.de/static/data/germany_vaccinations_timeseries_v2.tsv |
 | Appointment Availability | :warning: Only includes appointment data for _some_ vaccination centers, therefore not included in the JSONs, but in InfluxDB export. | impfterminservice.de / [monitoring script](https://github.com/rzfuhrmann/PHPImpftermine) | 2020-02-01 | https://github.com/rzfuhrmann/PHPImpftermine |
+| RKI COVID19 | | Hub RKI | 2020-01-27 | https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/dd4580c810204019a7b8eb3e0b329dd6_0/ |

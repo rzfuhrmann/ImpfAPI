@@ -32,6 +32,47 @@
     ); 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // CASES RKI ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    $offset = 0; 
+    $recordsPerQuery = 5000; 
+    do {
+        echo $offset."\n";
+        $json = json_decode(file_get_contents("https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query?where=1%3D1&outFields=*&returnDistinctValues=true&outSR=4326&f=json&resultRecordCount=".$recordsPerQuery."&resultOffset=".$offset), true);
+        foreach ($json["features"] as $feature){
+            $counts = $feature["attributes"]; 
+
+            $date = date("Y-m-d", floor($counts["Meldedatum"]/1000));
+            $bundesland = $counts["Bundesland"];
+
+            if (!isset($data[$date])) $data[$date] = array(); 
+            if (!isset($data[$date][$bundesland])) $data[$date][$bundesland] = array(); 
+            $impfstoff = "~~ total ~~";
+            if (!isset($data[$date][$bundesland][$impfstoff])) $data[$date][$bundesland][$impfstoff] = array(); 
+
+            $metrics = array(
+                "cases_count" => "AnzahlFall",
+                "cases_recovered" => "AnzahlGenesen",
+                "cases_dead" => "AnzahlTodesfall",
+
+                "cases_count_new" => "NeuerFall",
+                "cases_recovered_new" => "NeuGenesen",
+                "cases_dead_new" => "NeuerTodesfall",
+            );
+
+            foreach ($metrics as $metric => $rkimetric){
+                if (!isset($data[$date][$bundesland][$impfstoff][$metric])) $data[$date][$bundesland][$impfstoff][$metric] = 0; 
+
+                $data[$date][$bundesland][$impfstoff][$metric] += $counts[$rkimetric];
+            }
+        }
+        $offset += $recordsPerQuery;
+        file_put_contents(__DIR__.'/test.json', json_encode($json, JSON_PRETTY_PRINT)); 
+    } while (isset($json["exceededTransferLimit"]) && $json["exceededTransferLimit"]); 
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // IMPFQUOTENMONITORING XLSX ////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -271,6 +312,10 @@
                         '- Cleanup: Fixed typos, therefore summarized a few values (e.g. "Schleswig-Holtstein"/"Schleswig-Holstein", "astra"/"astrazeneca")'."\n".
                         '- Cleanup: Aligned vaccine names, cleaned-up the mix of company names and vaccine names'
                 ),
+                array(
+                    "date" => "2021-03-12",
+                    "description" => "Add COVID19 RKI data."
+                )
             ),
             "datasources" => array(
                 array(
